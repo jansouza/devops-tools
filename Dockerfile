@@ -25,3 +25,4 @@ RUN KUBECTL_VERSION=$(curl -sSL https://dl.k8s.io/release/stable.txt); \
         echo "Not supported"; \
         exit 1; \
     fi
+RUN mkdir -p ~/.kube

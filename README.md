@@ -1,6 +1,7 @@
 # Devops Tools
 
-Welcome to our Docker repository designed to streamline DevOps workflows. This Docker image contains essential tools for managing development and operations environments efficiently.
+Welcome to our Docker repository designed to streamline DevOps workflows. 
+This Docker image contains essential tools for devops.
 
 ## Key Features:
 
