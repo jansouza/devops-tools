@@ -9,6 +9,8 @@ This Docker image contains essential tools for devops.
 
 - **Included Kubectl:** Kubectl is readily available in this image, enabling you to efficiently manage and interact with your Kubernetes clusters.
 
+- **Included Trivy:** Trivy is the most popular open source security scanner, reliable, fast, and easy to use.
+
 - **Ready for DevOps:** With all essential tools already included, you can quickly set up a complete DevOps environment to develop, test, and deploy your applications.
 
 ## How to Use:
@@ -29,7 +31,13 @@ kubectl get pods
 kubectl apply -f your-config-file.yaml
 ```
 
-4. **Utilize Git:**
+4. **Interact with Trivy:**
+```
+trivy image python:3.4-alpine
+trivy k8s --report summary --timeout 3600s cluster
+```
+
+5. **Utilize Git:**
 ```
 git clone your-git-repository
 git commit -m "Your commit"

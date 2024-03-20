@@ -26,3 +26,8 @@ RUN KUBECTL_VERSION=$(curl -sSL https://dl.k8s.io/release/stable.txt); \
         exit 1; \
     fi
 RUN mkdir -p ~/.kube
+
+
+# trivy
+FROM base as trivy
+RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
