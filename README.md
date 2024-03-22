@@ -9,6 +9,8 @@ This Docker image contains essential tools for devops.
 
 - **Included Kubectl:** Kubectl is readily available in this image, enabling you to efficiently manage and interact with your Kubernetes clusters.
 
+- **Included Sonar Scanner:** The SonarScanner CLI is the scanner to use when there is no specific scanner for your build system.
+
 - **Included Trivy:** Trivy is the most popular open source security scanner, reliable, fast, and easy to use.
 
 - **Ready for DevOps:** With all essential tools already included, you can quickly set up a complete DevOps environment to develop, test, and deploy your applications.
@@ -16,33 +18,41 @@ This Docker image contains essential tools for devops.
 ## How to Use:
 
 1. **Pull the Docker Image:**
-```
-docker pull jansouza/devops-tools:latest
-```
+    ```
+    docker pull jansouza/devops-tools:latest
+    ```
 
 2. **Run a Container:**
-```
-docker run -it jansouza/devops-tools:latest /bin/sh
-```
+    ```
+    docker run -it jansouza/devops-tools:latest /bin/sh
+
+    docker exec -it <container-name-or-id> bash
+    ```
 
 3. **Interact with Kubectl:**
-```
-kubectl get pods
-kubectl apply -f your-config-file.yaml
-```
+    ```
+    kubectl get pods
+    kubectl apply -f your-config-file.yaml
+    ```
 
 4. **Interact with Trivy:**
-```
-trivy image python:3.4-alpine
-trivy k8s --report summary --timeout 3600s cluster
-```
+    ```
+    trivy image python:3.4-alpine
+    trivy k8s --report summary --timeout 3600s cluster
+    ```
 
-5. **Utilize Git:**
-```
-git clone your-git-repository
-git commit -m "Your commit"
-git push origin main
-```
+5. **Interact with Sonar Scanner:**
+    ```
+    export SONAR_TOKEN=*****************
+    sonar-scanner -Dsonar.projectKey=lab-app -Dsonar.sources=src/ -Dsonar.host.url=http://0.0.0.0:9000
+    ```
+
+6. **Utilize Git:**
+    ```
+    git clone your-git-repository
+    git commit -m "Your commit"
+    git push origin main
+    ```
 
 ## Contribution:
 
