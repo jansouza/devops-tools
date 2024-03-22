@@ -44,7 +44,8 @@ FROM base as sonar
 
 # Install pakages
 RUN apk add --no-cache \
-    openjdk17
+    openjdk17 \
+    nodejs
 
 WORKDIR /usr/local
 
