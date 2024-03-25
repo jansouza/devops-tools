@@ -13,6 +13,8 @@ This Docker image contains essential tools for devops.
 
 - **Included Trivy:** Trivy is the most popular open source security scanner, reliable, fast, and easy to use.
 
+- **Included gitleaks:** Gitleaks is a SAST tool for detecting and preventing hardcoded secrets like passwords, api keys, and tokens in git repos. Gitleaks is an easy-to-use, all-in-one solution for detecting secrets, past or present, in your code.
+
 - **Ready for DevOps:** With all essential tools already included, you can quickly set up a complete DevOps environment to develop, test, and deploy your applications.
 
 ## How to Use:
@@ -47,7 +49,12 @@ This Docker image contains essential tools for devops.
     sonar-scanner -Dsonar.projectKey=lab-app -Dsonar.sources=src/ -Dsonar.host.url=http://0.0.0.0:9000
     ```
 
-6. **Utilize Git:**
+6. **Interact with Gitleaks:**
+    ```
+    gitleaks detect --source . -v
+    ```
+
+7. **Utilize Git:**
     ```
     git clone your-git-repository
     git commit -m "Your commit"
