@@ -83,7 +83,7 @@ function deploy(){
   echo "  NAMESPACE=$NAMESPACE"
 
   # Change Image
-  if [ -n $DEPLOY_IMAGE ];then
+  if [ -n "${DEPLOY_IMAGE}" ];then
     echo "[Change Image]"
     echo "  sed -i "s@image.*@image: ${DEPLOY_IMAGE}@" $DEPLOYMENT_FILE"
     sed -i "s@image.*@image: ${DEPLOY_IMAGE}@" $DEPLOYMENT_FILE
