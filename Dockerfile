@@ -13,8 +13,7 @@ RUN apk add --no-cache \
     jq
 
 # Copy scripts
-WORKDIR /scripts
-COPY scripts/. .
+COPY scripts/. /usr/local/bin/.
 
 FROM base AS tools
 
