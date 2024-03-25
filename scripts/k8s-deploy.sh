@@ -3,7 +3,7 @@
 # set -x
 
 ## @file k8s-deploy.sh
-## @author Jan Souza <me@jansouza.1com>
+## @author Jan Souza <me@jansouza.com>
 ## @copyright
 ## @brief Deploy Application to K8s Cluster
 ##
@@ -12,7 +12,7 @@
 ## Global variables
 #################
 SCRIPT_NAME=k8s-deploy.sh
-VERSION="1.0"
+VERSION="1.1"
 
 #
 ## Script
@@ -39,10 +39,10 @@ function handle_arguments() {
     exit 1
   fi
   
-  if test -z "${DEPLOY_IMAGE}"; then
-    usage 'Missing argument: <image> are required.'
-    exit 1
-  fi
+  #if test -z "${DEPLOY_IMAGE}"; then
+  #  usage 'Missing argument: <image> are required.'
+  #  exit 1
+  #fi
 
   if test -z "${DEPLOYMENT_PATH}"; then
     usage 'Missing argument: <path> are required.'
@@ -74,29 +74,33 @@ function deploy(){
     exit 1
   fi
 
-  echo "[Change Image]"
-  echo "  sed -i "s@image.*@image: ${DEPLOY_IMAGE}@" $DEPLOYMENT_FILE"
-  sed -i "s@image.*@image: ${DEPLOY_IMAGE}@" $DEPLOYMENT_FILE
-  if [ "$?" -ne 0 ]; then
-    echo "Error to set Image registry"
-    exit 1
+  echo "[Get Deployment Info]"
+  DEPLOYMENT_NAME=$(kubectl get -f $DEPLOYMENT_FILE -o json|jq -r '.metadata.name')
+  NAMESPACE=$(kubectl get -f $DEPLOYMENT_FILE -o json|jq -r '.metadata.namespace')
+
+  echo "  DEPLOY_APP=$DEPLOY_APP"
+  echo "  DEPLOYMENT_NAME=$DEPLOYMENT_NAME"
+  echo "  NAMESPACE=$NAMESPACE"
+
+  # Change Image
+  if [ -n $DEPLOY_IMAGE ];then
+    echo "[Change Image]"
+    echo "  sed -i "s@image.*@image: ${DEPLOY_IMAGE}@" $DEPLOYMENT_FILE"
+    sed -i "s@image.*@image: ${DEPLOY_IMAGE}@" $DEPLOYMENT_FILE
+    if [ "$?" -ne 0 ]; then
+      echo "Error to set Image registry"
+      exit 1
+    fi
   fi
 
   # Execute kubectl apply
   echo "[kubectl apply]"
-  echo "  kubectl apply -f $DEPLOYMENT_FILE"
-  kubectl apply -f $DEPLOYMENT_FILE
-  if [ "$?" -ne 0 ]; then
-    echo "Error to Deploy Application"
-    exit 1
-  fi
-
   CONFIGMAP_FILE=$DEPLOYMENT_PATH/config.yaml
   SERVICE_FILE=$DEPLOYMENT_PATH/service.yaml
   INGRESS_FILE=$DEPLOYMENT_PATH/ingress.yaml
   CRONJOB_FILE=$DEPLOYMENT_PATH/cronjob.yaml
 
-  declare -a FILES=("$CONFIGMAP_FILE" "$SERVICE_FILE" "$INGRESS_FILE" "$CRONJOB_FILE")
+  declare -a FILES=("$DEPLOYMENT_FILE" "$CONFIGMAP_FILE" "$SERVICE_FILE" "$INGRESS_FILE" "$CRONJOB_FILE")
   for FILE in "${FILES[@]}"
   do
     if [ -f $FILE ]; then
@@ -108,16 +112,15 @@ function deploy(){
       fi
     fi
   done
+
+  # Config Folders
+  if [ -d $DEPLOYMENT_PATH/config ];then
+    kubectl delete configmap $DEPLOYMENT_NAME-config -n $NAMESPACE
+    kubectl create configmap $DEPLOYMENT_NAME-config --from-file=$DEPLOYMENT_PATH/config -n $NAMESPACE
+  fi
     
   # Execute kubectl rollout
   echo "[kubectl rollout]"
-  DEPLOYMENT_NAME=$(kubectl get -f $DEPLOYMENT_FILE -o json|jq -r '.metadata.name')
-  NAMESPACE=$(kubectl get -f $DEPLOYMENT_FILE -o json|jq -r '.metadata.namespace')
-
-  echo "  DEPLOY_APP=$DEPLOY_APP"
-  echo "  DEPLOYMENT_NAME=$DEPLOYMENT_NAME"
-  echo "  NAMESPACE=$NAMESPACE"
-
   echo "  kubectl rollout restart deployment $DEPLOYMENT_NAME -n $NAMESPACE"
   kubectl rollout restart deployment $DEPLOYMENT_NAME -n $NAMESPACE
   if [ "$?" -ne 0 ]; then
