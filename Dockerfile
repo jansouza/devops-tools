@@ -10,7 +10,8 @@ RUN apk add --no-cache \
     bash \
     curl \
     git \
-    jq
+    jq \
+    skopeo
 
 # Copy scripts
 COPY scripts/. /usr/local/bin/.
@@ -81,7 +82,6 @@ RUN if [[ "$TARGETPLATFORM" == *"arm"* ]]; then \
 RUN tar -xzvf /usr/local/bin/gitleaks.tar.gz -C /usr/local/bin
 RUN rm -f /usr/local/bin/gitleaks.tar.gz; rm -f /usr/local/bin/LICENSE; rm -f /usr/local/bin/README.md
 RUN chmod +x /usr/local/bin/gitleaks
-
 
 #
 WORKDIR /
