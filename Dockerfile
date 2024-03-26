@@ -9,6 +9,7 @@ RUN apk add --no-cache \
     ca-certificates \
     bash \
     curl \
+    curl-dev \
     git \
     jq \
     skopeo
@@ -21,17 +22,17 @@ FROM base AS tools
 ############
 # kubectl
 ############
-RUN KUBECTL_VERSION=$(curl -sSL https://dl.k8s.io/release/stable.txt); \
-    if [[ "$TARGETPLATFORM" == *"arm"* ]]; then \
-        curl -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/arm64/kubectl; \
-        chmod +x /usr/local/bin/kubectl; \
-    elif [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
-        curl -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl; \
-        chmod +x /usr/local/bin/kubectl; \
-    else \
-        echo "Not supported"; \
-        exit 1; \
-    fi
+#RUN KUBECTL_VERSION=$(curl -sSL https://dl.k8s.io/release/stable.txt); \
+#    if [[ "$TARGETPLATFORM" == *"arm"* ]]; then \
+#        curl -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/arm64/kubectl; \
+#        chmod +x /usr/local/bin/kubectl; \
+#    elif [[ "$TARGETPLATFORM" == "linux/amd64" ]]; then \
+#        curl -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl; \
+#        chmod +x /usr/local/bin/kubectl; \
+#    else \
+#        echo "Not supported"; \
+#        exit 1; \
+#    fi
 RUN mkdir -p ~/.kube
 
 
