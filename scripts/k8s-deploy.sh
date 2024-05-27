@@ -12,7 +12,7 @@
 ## Global variables
 #################
 SCRIPT_NAME=k8s-deploy.sh
-VERSION="1.1"
+VERSION="1.2"
 
 #
 ## Script
@@ -29,7 +29,7 @@ function handle_arguments() {
     case "${1}" in
       --app=*) DEPLOY_APP="${1#*=}"; shift 1;; # string
       --image=*) DEPLOY_IMAGE="${1#*=}"; shift 1;; # string
-      --path=*) DEPLOYMENT_PATH="${1#*=}"; shift 1;; # string
+      --path=*) DEPLOY_PATH="${1#*=}"; shift 1;; # string
       *) usage "Unknown option: ${1}"; exit 1;;
     esac
   done
@@ -38,20 +38,15 @@ function handle_arguments() {
     usage 'Missing argument: <app> are required.'
     exit 1
   fi
-  
-  #if test -z "${DEPLOY_IMAGE}"; then
-  #  usage 'Missing argument: <image> are required.'
-  #  exit 1
-  #fi
 
-  if test -z "${DEPLOYMENT_PATH}"; then
+  if test -z "${DEPLOY_PATH}"; then
     usage 'Missing argument: <path> are required.'
     exit 1
   fi
 
   echo "DEPLOY_APP: $DEPLOY_APP"
   echo "DEPLOY_IMAGE: $DEPLOY_IMAGE"
-  echo "DEPLOYMENT_PATH: $DEPLOYMENT_PATH"
+  echo "DEPLOY_PATH: $DEPLOY_PATH"
 }
 
 function usage() {
@@ -66,27 +61,33 @@ function deploy(){
   echo "K8s - DEPLOY"
   echo "--------------"
 
-  DEPLOYMENT_FILE="$DEPLOYMENT_PATH/deployment.yaml"
-  
   # Check if File Exist
-  if [ ! -f $DEPLOYMENT_FILE ]; then
-    echo "DEPLOYMENT_FILE not found"
+  if [ -f $DEPLOY_PATH/deployment.yaml ]; then
+    DEPLOY_TYPE="deployment"
+    DEPLOY_FILE="$DEPLOY_PATH/deployment.yaml"
+  elif [ -f $DEPLOY_PATH/daemonset.yaml ]; then
+    DEPLOY_TYPE="daemonset"
+    DEPLOY_FILE="$DEPLOY_PATH/daemonset.yaml"
+  else
+    echo "DEPLOYMENT or DAEMONSET file not found"
     exit 1
   fi
 
-  echo "[Get Deployment Info]"
-  DEPLOYMENT_NAME=$(kubectl get -f $DEPLOYMENT_FILE -o json|jq -r '.metadata.name')
-  NAMESPACE=$(kubectl get -f $DEPLOYMENT_FILE -o json|jq -r '.metadata.namespace')
+  echo "[Get metadata Info]"
+  DEPLOY_NAME=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.metadata.name')
+  DEPLOY_NAMESPACE=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.metadata.namespace')
 
+  echo "  DEPLOY_TYPE=$DEPLOY_TYPE"
+  echo "  DEPLOY_FILE=$DEPLOY_FILE"
   echo "  DEPLOY_APP=$DEPLOY_APP"
-  echo "  DEPLOYMENT_NAME=$DEPLOYMENT_NAME"
-  echo "  NAMESPACE=$NAMESPACE"
+  echo "  DEPLOY_NAME=$DEPLOY_NAME"
+  echo "  DEPLOY_NAMESPACE=$DEPLOY_NAMESPACE"
 
   # Change Image
   if [ -n "${DEPLOY_IMAGE}" ];then
     echo "[Change Image]"
-    echo "  sed -i "s@image.*@image: ${DEPLOY_IMAGE}@" $DEPLOYMENT_FILE"
-    sed -i "s@image.*@image: ${DEPLOY_IMAGE}@" $DEPLOYMENT_FILE
+    echo "  sed -i "s@image.*@image: ${DEPLOY_IMAGE}@" $DEPLOY_FILE"
+    sed -i "s@image.*@image: ${DEPLOY_IMAGE}@" $DEPLOY_FILE
     if [ "$?" -ne 0 ]; then
       echo "Error to set Image registry"
       exit 1
@@ -95,48 +96,48 @@ function deploy(){
 
   # Execute kubectl apply
   echo "[kubectl apply]"
-  CONFIGMAP_FILE=$DEPLOYMENT_PATH/config.yaml
-  SERVICE_FILE=$DEPLOYMENT_PATH/service.yaml
-  INGRESS_FILE=$DEPLOYMENT_PATH/ingress.yaml
-  CRONJOB_FILE=$DEPLOYMENT_PATH/cronjob.yaml
+  DEPLOY_CONFIGMAP_FILE=$DEPLOY_PATH/config.yaml
+  DEPLOY_SERVICE_FILE=$DEPLOY_PATH/service.yaml
+  DEPLOY_INGRESS_FILE=$DEPLOY_PATH/ingress.yaml
+  DEPLOY_CRONJOB_FILE=$DEPLOY_PATH/cronjob.yaml
 
-  declare -a FILES=("$DEPLOYMENT_FILE" "$CONFIGMAP_FILE" "$SERVICE_FILE" "$INGRESS_FILE" "$CRONJOB_FILE")
+  declare -a FILES=("$DEPLOY_FILE" "$DEPLOY_CONFIGMAP_FILE" "$DEPLOY_SERVICE_FILE" "$DEPLOY_INGRESS_FILE" "$DEPLOY_CRONJOB_FILE")
   for FILE in "${FILES[@]}"
   do
     if [ -f $FILE ]; then
       echo "  kubectl apply -f $FILE"
       kubectl apply -f $FILE
       if [ "$?" -ne 0 ]; then
-        echo "Error to Deploy Application - $FILE"
+        echo "Error to Deploy file - $FILE"
         exit 1
       fi
     fi
   done
 
   # Config Folders
-  if [ -d $DEPLOYMENT_PATH/config ];then
-    kubectl delete configmap $DEPLOYMENT_NAME-config -n $NAMESPACE
-    kubectl create configmap $DEPLOYMENT_NAME-config --from-file=$DEPLOYMENT_PATH/config -n $NAMESPACE
+  if [ -d $DEPLOY_PATH/config ];then
+    kubectl delete configmap $DEPLOY_NAME-config -n $DEPLOY_NAMESPACE
+    kubectl create configmap $DEPLOY_NAME-config --from-file=$DEPLOY_PATH/config -n $DEPLOY_NAMESPACE
   fi
     
   # Execute kubectl rollout
   echo "[kubectl rollout]"
-  echo "  kubectl rollout restart deployment $DEPLOYMENT_NAME -n $NAMESPACE"
-  kubectl rollout restart deployment $DEPLOYMENT_NAME -n $NAMESPACE
+  echo "  kubectl rollout restart $DEPLOY_TYPE $DEPLOY_NAME -n $DEPLOY_NAMESPACE"
+  kubectl rollout restart $DEPLOY_TYPE $DEPLOY_NAME -n $DEPLOY_NAMESPACE
   if [ "$?" -ne 0 ]; then
     echo "Error to kubectl rollout restart"
     exit 1
   fi
 
   #echo "Get rollout status"
-  kubectl rollout status deployment $DEPLOYMENT_NAME -n $NAMESPACE
+  kubectl rollout status $DEPLOY_TYPE $DEPLOY_NAME -n $DEPLOY_NAMESPACE
   if [ "$?" -ne 0 ]; then
     echo "Error to kubectl rollout status"
     exit 1
   fi
 
   #echo "List POD"
-  kubectl get pods --selector app=$DEPLOY_APP -n $NAMESPACE
+  kubectl get pods --selector app=$DEPLOY_APP -n $DEPLOY_NAMESPACE
 
   echo "All done"
   exit 0
