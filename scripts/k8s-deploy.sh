@@ -12,7 +12,7 @@
 ## Global variables
 #################
 SCRIPT_NAME=k8s-deploy.sh
-VERSION="1.3"
+VERSION="1.4"
 
 #
 ## Script
@@ -74,18 +74,18 @@ function deploy(){
   fi
 
   echo "[Get metadata Info]"
-  DEPLOY_KIND=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.metadata.kind')
+  DEPLOY_KIND=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.kind')
   DEPLOY_NAME=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.metadata.name')
   DEPLOY_NAMESPACE=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.metadata.namespace')
   
-  if [ "$DEPLOY_KIND" = "DaemonSet" ]; then
+  if [[ "$DEPLOY_KIND" == "DaemonSet" ]]; then
     DEPLOY_TYPE="daemonset"
-  elif [ "$DEPLOY_KIND" = "Deployment" ]; then
+  elif [[ "$DEPLOY_KIND" == "Deployment" ]]; then
     DEPLOY_TYPE="deployment"
-  elif [ "$DEPLOY_KIND" = "StatefulSet" ]; then
+  elif [[ "$DEPLOY_KIND" == "StatefulSet" ]]; then
     DEPLOY_TYPE="statefulset"
   else
-    echo "DEPLOY_KIND not found (DaemonSet, Deployment, StatefulSet)"
+    echo "DEPLOY_KIND: $DEPLOY_KIND not found (DaemonSet, Deployment, StatefulSet)"
     exit 1
   fi
 
