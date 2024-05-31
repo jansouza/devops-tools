@@ -12,7 +12,7 @@
 ## Global variables
 #################
 SCRIPT_NAME=k8s-deploy.sh
-VERSION="1.2"
+VERSION="1.3"
 
 #
 ## Script
@@ -63,23 +63,36 @@ function deploy(){
 
   # Check if File Exist
   if [ -f $DEPLOY_PATH/deployment.yaml ]; then
-    DEPLOY_TYPE="deployment"
     DEPLOY_FILE="$DEPLOY_PATH/deployment.yaml"
   elif [ -f $DEPLOY_PATH/daemonset.yaml ]; then
-    DEPLOY_TYPE="daemonset"
     DEPLOY_FILE="$DEPLOY_PATH/daemonset.yaml"
+  elif [ -f $DEPLOY_PATH/statefulset.yaml ]; then
+    DEPLOY_FILE="$DEPLOY_PATH/statefulset.yaml"
   else
-    echo "DEPLOYMENT or DAEMONSET file not found"
+    echo "Deploy file (deployment.yaml, daemonset.yaml or statefulset.yaml) not found in path: $DEPLOY_PATH"
     exit 1
   fi
 
   echo "[Get metadata Info]"
+  DEPLOY_KIND=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.metadata.kind')
   DEPLOY_NAME=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.metadata.name')
   DEPLOY_NAMESPACE=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.metadata.namespace')
+  
+  if [ "$DEPLOY_KIND" = "DaemonSet" ]; then
+    DEPLOY_TYPE="daemonset"
+  elif [ "$DEPLOY_KIND" = "Deployment" ]; then
+    DEPLOY_TYPE="deployment"
+  elif [ "$DEPLOY_KIND" = "StatefulSet" ]; then
+    DEPLOY_TYPE="statefulset"
+  else
+    echo "DEPLOY_KIND not found (DaemonSet, Deployment, StatefulSet)"
+    exit 1
+  fi
 
   echo "  DEPLOY_TYPE=$DEPLOY_TYPE"
   echo "  DEPLOY_FILE=$DEPLOY_FILE"
   echo "  DEPLOY_APP=$DEPLOY_APP"
+  echo "  DEPLOY_KIND=$DEPLOY_KIND"
   echo "  DEPLOY_NAME=$DEPLOY_NAME"
   echo "  DEPLOY_NAMESPACE=$DEPLOY_NAMESPACE"
 
