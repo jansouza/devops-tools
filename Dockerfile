@@ -90,8 +90,10 @@ RUN chmod +x /usr/local/bin/gitleaks
 # terraform
 #############
 
-# Install
-ARG TERRAFORM_VERSION=1.9.8
+ENV TERRAFORM_VERSION=1.9.8
+ENV TFLINT_VERSION=0.53.0
+
+# Install Terraform
 RUN if [[ "$TARGETPLATFORM" == *"arm"* ]]; then \
         wget -O /usr/local/bin/terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_arm64.zip; \
     elif [[ "$TARGETPLATFORM" == "linux/amd64" || "$TARGETPLATFORM" == "x86_64" ]]; then \
@@ -101,9 +103,24 @@ RUN if [[ "$TARGETPLATFORM" == *"arm"* ]]; then \
         exit 1; \
     fi
 
-RUN unzip /usr/local/bin/terraform.zip -d /usr/local/bin/
-RUN chmod +x /usr/local/bin/terraform
-RUN rm /usr/local/bin/terraform.zip
+RUN unzip /usr/local/bin/terraform.zip -d /usr/local/bin/ \
+    && chmod +x /usr/local/bin/terraform \
+    && rm /usr/local/bin/terraform.zip
+
+# Install TFLint
+RUN if [[ "$TARGETPLATFORM" == *"arm"* ]]; then \
+        wget -O /usr/local/bin/tflint.zip https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_arm64.zip; \
+    elif [[ "$TARGETPLATFORM" == "linux/amd64" || "$TARGETPLATFORM" == "x86_64" ]]; then \
+        wget -O /usr/local/bin/tflint.zip https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_amd64.zip; \
+    else \
+        echo "Not supported"; \
+        exit 1; \
+    fi
+
+RUN unzip /usr/local/bin/tflint.zip -d /usr/local/bin/ \
+    && chmod +x /usr/local/bin/tflint \
+    && rm /usr/local/bin/tflint.zip
+
 
 #############
 # AWS CLI

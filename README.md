@@ -17,6 +17,8 @@ This Docker image contains essential tools for devops.
 
 - **Included Skopeo:** Skopeo is a tool for manipulating, inspecting, signing, and transferring container images and image repositories on Linux® systems, Windows and MacOS. Like Podman and Buildah, Skopeo is an open source community-driven project that does not require running a container daemon..
 
+- **Included Terraform:** Terraform is an Infrastructure as Code tool with a broader reach, which lets developers automate complete infrastructure that spans multiple public clouds and private clouds
+
 - **Ready for DevOps:** With all essential tools already included, you can quickly set up a complete DevOps environment to develop, test, and deploy your applications.
 
 ## How to Use:
@@ -30,7 +32,7 @@ This Docker image contains essential tools for devops.
     ```
     docker run -it jansouza/devops-tools:latest /bin/sh
 
-    docker exec -it <container-name-or-id> bash
+    docker exec -it devops-tools bash
     ```
 
 3. **Utilize Git:**
@@ -66,6 +68,13 @@ This Docker image contains essential tools for devops.
 8. **Interact with skopeo:**
     ```
     skopeo copy docker://jjasghar/catapp:latest docker://quay.io/jjasghar/catapp:latest
+    ```
+
+9. **Interact with terraform:**
+    ```
+    $ terraform init
+    $ terraform plan
+    $ terraform apply
     ```
 
 
