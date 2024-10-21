@@ -71,7 +71,7 @@ RUN unzip sonar-scanner-cli-$CLI_VERSION.zip; \
 #############
 
 # Install
-ARG GITLEAKS_VERSION=8.18.2
+ARG GITLEAKS_VERSION=8.21.1
 RUN if [[ "$TARGETPLATFORM" == *"arm"* ]]; then \
         wget -O /usr/local/bin/gitleaks.tar.gz https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_arm64.tar.gz; \
     elif [[ "$TARGETPLATFORM" == "linux/amd64" || "$TARGETPLATFORM" == "x86_64" ]]; then \
