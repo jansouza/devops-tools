@@ -23,12 +23,12 @@ ARG TARGETPLATFORM
 ############
 # kubectl
 ############
-RUN KUBECTL_VERSION=$(curl -sSL https://dl.k8s.io/release/stable.txt); \
+RUN KUBECTL_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt); \
     if [[ "$TARGETPLATFORM" == *"arm"* ]]; then \
-        curl -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/arm64/kubectl; \
+        curl -o /usr/local/bin/kubectl -LO https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/arm64/kubectl; \
         chmod +x /usr/local/bin/kubectl; \
     elif [[ "$TARGETPLATFORM" == "linux/amd64" || "$TARGETPLATFORM" == "x86_64" ]]; then \
-        curl -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl; \
+        curl -o /usr/local/bin/kubectl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"; \
         chmod +x /usr/local/bin/kubectl; \
     else \
         echo "Not supported"; \

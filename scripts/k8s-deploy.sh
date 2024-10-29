@@ -74,6 +74,7 @@ function deploy(){
   fi
 
   echo "[Get metadata Info]"
+  echo "DEPLOY_FILE: $DEPLOY_FILEs"
   DEPLOY_KIND=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.kind')
   DEPLOY_NAME=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.metadata.name')
   DEPLOY_NAMESPACE=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.metadata.namespace')
