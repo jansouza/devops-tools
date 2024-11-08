@@ -36,12 +36,10 @@ RUN KUBECTL_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt); \
     fi
 RUN mkdir -p ~/.kube
 
-
 ##########
 # trivy
 ##########
 RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-
 
 ####################
 # sonar-scanner-cli
@@ -65,7 +63,6 @@ RUN unzip sonar-scanner-cli-$CLI_VERSION.zip; \
     ln -s /usr/local/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner; \
     ln -s /usr/local/sonar-scanner/bin/sonar-scanner-debug /usr/local/bin/sonar-scanner-debug
 
-
 #############
 # gitleaks
 #############
@@ -84,7 +81,6 @@ RUN if [[ "$TARGETPLATFORM" == *"arm"* ]]; then \
 RUN tar -xzvf /usr/local/bin/gitleaks.tar.gz -C /usr/local/bin
 RUN rm -f /usr/local/bin/gitleaks.tar.gz; rm -f /usr/local/bin/LICENSE; rm -f /usr/local/bin/README.md
 RUN chmod +x /usr/local/bin/gitleaks
-
 
 #############
 # terraform
@@ -120,7 +116,6 @@ RUN if [[ "$TARGETPLATFORM" == *"arm"* ]]; then \
 RUN unzip /usr/local/bin/tflint.zip -d /usr/local/bin/ \
     && chmod +x /usr/local/bin/tflint \
     && rm /usr/local/bin/tflint.zip
-
 
 #############
 # AWS CLI

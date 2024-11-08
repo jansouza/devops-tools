@@ -1,4 +1,4 @@
-name: Release Docker Image with new Tag
+name: devops-tools - Pipeline
 
 on:
   push:

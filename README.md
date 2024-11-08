@@ -3,6 +3,10 @@
 Welcome to our Docker repository designed to streamline DevOps workflows. 
 This Docker image contains essential tools for devops.
 
+## Badge:
+
+[![devops-tools - Pipeline](https://github.com/jansouza/devops-tools/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/jansouza/devops-tools/actions/workflows/release.yml)
+
 ## Key Features:
 
 - **Pre-installed Git:** Git is already configured in this image, making it easy to manage version control of your projects directly from your Docker environment.
