@@ -51,7 +51,7 @@ def call(Map config) {
                 
             stage('Terraform Init') {
                 steps {
-                    withCloudCredentials(config.cloud_provider, config.credentials) {
+                    withCloudCredentials(config.cloud_provider, config.cloud_credentials) {
                         sh """
                         cd ${config.terraform_base_path}/
                         terraform init
@@ -71,7 +71,7 @@ def call(Map config) {
 
             stage('Terraform Plan') {
                 steps {
-                    withCloudCredentials(config.cloud_provider, config.credentials) {
+                    withCloudCredentials(config.cloud_provider, config.cloud_credentials) {
                         sh """
                         cd ${config.terraform_base_path}/
                         terraform plan -out=tfplan -no-color
@@ -83,7 +83,7 @@ def call(Map config) {
 
             stage('Terraform Plan') {
                 steps {
-                    withCloudCredentials(config.cloud_provider, config.credentials) {
+                    withCloudCredentials(config.cloud_provider, config.cloud_credentials) {
                         sh """
                         cd ${config.terraform_base_path}/
                         terraform plan -out tf-plan.out
@@ -99,7 +99,7 @@ def call(Map config) {
                 }
                 steps {
                     
-                    withCloudCredentials(config.cloud_provider, config.credentials) {
+                    withCloudCredentials(config.cloud_provider, config.cloud_credentials) {
                         sh """
                         cd ${terraformBasePath}/
                     
