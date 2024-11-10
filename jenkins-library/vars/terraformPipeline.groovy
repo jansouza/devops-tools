@@ -74,18 +74,6 @@ def call(Map config) {
                     withCloudCredentials(config.cloud_provider, config.cloud_credentials) {
                         sh """
                         cd ${config.terraform_base_path}/
-                        terraform plan -out=tfplan -no-color
-                        terraform show -no-color tf-plan.out
-                        """
-                    }
-                }
-            }
-
-            stage('Terraform Plan') {
-                steps {
-                    withCloudCredentials(config.cloud_provider, config.cloud_credentials) {
-                        sh """
-                        cd ${config.terraform_base_path}/
                         terraform plan -out tf-plan.out
                         terraform show -no-color tf-plan.out
                         """
