@@ -18,9 +18,9 @@ def call(Map config) {
                 defaultContainer 'devops-tools'
             }
         }
-        options {
-            ansiColor('xterm')
-        }
+        //options {
+        //    ansiColor('xterm')
+        //}
 
         stage('Checkout Source') {
             steps {
