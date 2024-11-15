@@ -72,7 +72,7 @@ def call(Map config) {
             stage('SonarQube Scan') {
                 when {
                     expression {
-                        return !(config.sonar_project_key)
+                        return config.sonar_project_key?.trim()
                     }
                 }
                 steps {
@@ -108,7 +108,7 @@ def call(Map config) {
                 steps {
                     withCloudCredentials(config.cloud_provider, config.cloud_credentials) {
                         sh """
-                        cd ${terraformBasePath}/
+                        cd ${config.terraformBasePath}/
                     
                         terraform plan -out tf-plan.out
                         terraform show -no-color tf-plan.out
