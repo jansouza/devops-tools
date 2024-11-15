@@ -69,6 +69,23 @@ def call(Map config) {
                 }
             }
 
+            stage('SonarQube Scan') {
+                when {
+                    expression {
+                        return !(config.sonar_project_key)
+                    }
+                }
+                steps {
+                    withCredentials([
+                        string(credentialsId: config.sonar_credentials_id, variable: 'SONAR_TOKEN')
+                    ]) {
+                        sh """
+                        sonar-scanner -Dsonar.projectKey=${config.sonar_project_key} -Dsonar.sources=${config.terraform_base_path}/ -Dsonar.host.url=${config.sonar_url}
+                        """
+                    }
+                }
+            }
+
             stage('Terraform Plan') {
                 steps {
                     withCloudCredentials(config.cloud_provider, config.cloud_credentials) {
@@ -83,10 +100,12 @@ def call(Map config) {
 
             stage('Terraform Apply') {
                 when {
-                    branch 'main'
+                    expression {
+                        return (config.git_branch == 'main')
+                    }
                 }
+
                 steps {
-                    
                     withCloudCredentials(config.cloud_provider, config.cloud_credentials) {
                         sh """
                         cd ${terraformBasePath}/
