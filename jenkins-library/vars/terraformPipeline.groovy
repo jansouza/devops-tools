@@ -112,7 +112,7 @@ def call(Map config) {
                     
                         terraform plan -out tf-plan.out
                         terraform show -no-color tf-plan.out
-                        terraform apply -out tf-plan.out
+                        terraform apply tf-plan.out
                         """
                     }
                 }
