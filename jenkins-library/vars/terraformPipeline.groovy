@@ -50,6 +50,11 @@ def call(Map config) {
             }
                 
             stage('Terraform Init') {
+                when {
+                    expression {
+                        return (!config.terraform_module?.trim() && config.terraform_module == 'false')
+                    }
+                }
                 steps {
                     withCloudCredentials(config.cloud_provider, config.cloud_credentials) {
                         sh """
@@ -87,6 +92,11 @@ def call(Map config) {
             }
 
             stage('Terraform Plan') {
+                 when {
+                    expression {
+                        return (!config.terraform_module?.trim() && config.terraform_module == 'false')
+                    }
+                }
                 steps {
                     withCloudCredentials(config.cloud_provider, config.cloud_credentials) {
                         sh """
@@ -101,7 +111,7 @@ def call(Map config) {
             stage('Terraform Apply') {
                 when {
                     expression {
-                        return (config.git_branch == 'main')
+                        return (config.git_branch == 'main' && !config.terraform_module?.trim() && config.terraform_module == 'false')
                     }
                 }
 
