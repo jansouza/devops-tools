@@ -1,6 +1,10 @@
 #!/usr/bin/env groovy
 
 def call(Map config) {
+    // Default values
+    config.git_branch = config.git_branch ?: 'main'
+    config.cloud_provider = config.cloud_provider ?: 'aws'
+    config.terraform_module = config.terraform_module ?: 'false'
 
     pipeline {
         agent {
@@ -52,7 +56,7 @@ def call(Map config) {
             stage('Terraform Init') {
                 when {
                     expression {
-                        return (!config.terraform_module?.trim() && config.terraform_module == 'false')
+                        return (config.terraform_module == 'false')
                     }
                 }
                 steps {
@@ -94,7 +98,7 @@ def call(Map config) {
             stage('Terraform Plan') {
                  when {
                     expression {
-                        return (!config.terraform_module?.trim() && config.terraform_module == 'false')
+                        return (config.terraform_module == 'false')
                     }
                 }
                 steps {
@@ -111,7 +115,7 @@ def call(Map config) {
             stage('Terraform Apply') {
                 when {
                     expression {
-                        return (config.git_branch == 'main' && !config.terraform_module?.trim() && config.terraform_module == 'false')
+                        return (config.git_branch == 'main' && config.terraform_module == 'false')
                     }
                 }
 
