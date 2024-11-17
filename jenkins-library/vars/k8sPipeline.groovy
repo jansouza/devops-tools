@@ -38,7 +38,7 @@ def call(Map config) {
             stage('GitLeaks Scan') {
                 steps {
                     sh """
-                    gitleaks dir ${config.deploy_path} -v
+                    gitleaks dir ${config.deploy_path}/${config.project_namespace}/${config.project_name} -v
                     """
                 }
             }
