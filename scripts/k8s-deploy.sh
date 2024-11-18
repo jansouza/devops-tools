@@ -75,9 +75,9 @@ function deploy(){
 
   echo "[Get metadata Info]"
   echo "DEPLOY_FILE: $DEPLOY_FILE"
-  DEPLOY_KIND=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.kind')
-  DEPLOY_NAME=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.metadata.name')
-  DEPLOY_NAMESPACE=$(kubectl get -f $DEPLOY_FILE -o json|jq -r '.metadata.namespace')
+  DEPLOY_KIND=$(yq e '.kind' $DEPLOY_FILE)
+  DEPLOY_NAME=$(yq e '.metadata.name' $DEPLOY_FILE)
+  DEPLOY_NAMESPACE=$(yq e '.metadata.namespace' $DEPLOY_FILE)
   
   if [[ "$DEPLOY_KIND" == "DaemonSet" ]]; then
     DEPLOY_TYPE="daemonset"

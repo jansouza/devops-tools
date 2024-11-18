@@ -12,7 +12,8 @@ RUN apk add --no-cache \
     curl-dev \
     git \
     jq \
-    skopeo
+    skopeo \
+    yq
 
 # Copy scripts
 COPY scripts/. /usr/local/bin/.
