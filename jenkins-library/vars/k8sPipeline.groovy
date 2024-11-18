@@ -3,7 +3,7 @@
 def call(Map config) {
     // Default values
     config.git_branch = config.git_branch ?: 'main'
-    config.deploy_path = config.deploy_path ?: 'deployments/'
+    config.deploy_path = config.deploy_path ?: 'deployments'
 
     pipeline {
         agent {
