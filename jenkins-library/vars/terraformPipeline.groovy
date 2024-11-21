@@ -5,6 +5,7 @@ def call(Map config) {
     config.git_branch = config.git_branch ?: 'main'
     config.cloud_provider = config.cloud_provider ?: 'aws'
     config.terraform_module = config.terraform_module ?: 'false'
+    config.cache_path = config.cache_path ?: '/var/jenkins_home/cache'
 
     pipeline {
         agent {
@@ -18,6 +19,13 @@ def call(Map config) {
                       image: jansouza/devops-tools:latest
                       alwaysPullImage: true
                       command: ["sleep", "infinity"]
+                      volumeMounts:
+                        - name: jenkins-cache
+                          mountPath: ${config.cache_path}
+                    volumes:
+                    - name: jenkins-cache
+                      persistentVolumeClaim:
+                        claimName: jenkins-cache-pvc
                 '''
                 defaultContainer 'devops-tools'
             }
@@ -46,6 +54,8 @@ def call(Map config) {
             stage('Terraform TFLint') {
                 steps {
                     sh """
+                    mkdir -p ${config.cache_path}/tflint
+                    export TFLINT_PLUGIN_DIR=${config.cache_path}/tflint
                     cd ${config.terraform_base_path}/
                     tflint --init
                     tflint --chdir=.
@@ -73,7 +83,8 @@ def call(Map config) {
             stage('Trivy Scan') {
                 steps {
                     sh """
-                    trivy config --ignorefile ${config.terraform_base_path}/.trivyignore --format table --exit-code 1 --severity CRITICAL,HIGH ${config.terraform_base_path}
+                    mkdir -p ${config.cache_path}/trivy
+                    trivy config --cache-dir ${config.cache_path}/trivy --ignorefile ${config.terraform_base_path}/.trivyignore --format table --exit-code 1 --severity CRITICAL,HIGH ${config.terraform_base_path}
                     """
                 }
             }
